@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+
+@-webkit-keyframes fade-in {   0% { opacity: 0.3; }   100% { opacity: 1; }   }
+ 
+body{
+	position: fixed; top: 30%; left: 5%;
+	background-image: url(back2.png);
+	background-size: 100%;
+	border-radius: 10px 10px 10px 10px;
+  	-webkit-animation: fade-in 1s linear;
+}
+
+.wrapp{
+	display:flex;
+	position: fixed; top: 35%; left:5%;
+}
+
+.imagesBox{
+	width:30%;
+	text-align:center;
+}
+
+p.greeting{
+	position: fixed; top:10%; left:30%;
+	text-align: center; 
+	color:white;
+    font: normal 25px/100% Verdana, Tahoma, sans-serif; 
+	width: 500px; 
+}
+
+.imagesBox img{
+    width:100%;
+}
