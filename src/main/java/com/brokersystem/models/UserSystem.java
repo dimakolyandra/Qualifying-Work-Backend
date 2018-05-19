@@ -7,10 +7,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -18,6 +21,8 @@ import javax.persistence.Table;
 public class UserSystem {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_GENERATOR")
+    @SequenceGenerator(name="USER_GENERATOR", sequenceName = "GET_ID_USER_SYSTEM", allocationSize=1)
     @Column(name="USER_SYSTEM_ID")
     private Integer userSystemId;
     
@@ -49,10 +54,10 @@ public class UserSystem {
     @JoinColumn(name="BROKER_FIRM_ID")
     private BrokerFirm brokerFirm;
     
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="trader", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="trader", cascade=CascadeType.ALL)
     private List<TradingContract> tradersContract;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="broker", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="broker", cascade=CascadeType.ALL)
     private List<TradingContract> brokersContract;
 
     public Integer getUserSystemId() {
@@ -134,7 +139,6 @@ public class UserSystem {
     public void setBrokerFirm(BrokerFirm brokerFirm) {
         this.brokerFirm = brokerFirm;
     }
-
 
     public List<TradingContract> getTradersContract() {
         return tradersContract;

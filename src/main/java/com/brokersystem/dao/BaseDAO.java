@@ -1,15 +1,18 @@
 package com.brokersystem.dao;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.brokersystem.models.Currency;
 
 @Repository
 @Transactional(propagation=Propagation.REQUIRED)
@@ -45,5 +48,13 @@ public class BaseDAO <TypeObj, TypeKey> {
         
     public void updateObj(TypeKey obj){
         currentSession().update(obj);
+    }
+    
+    public List<TypeObj> getObjectsByFieldsValue(Map<String, String> fieldsValue){
+        Criteria criteria = currentSession().createCriteria(typeObjClass);
+        for(Map.Entry<String, String> field: fieldsValue.entrySet()){
+            criteria.add(Restrictions.eq(field.getKey(), field.getValue()));
+        }
+        return criteria.list();
     }
 }

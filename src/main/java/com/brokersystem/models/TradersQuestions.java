@@ -18,11 +18,11 @@ public class TradersQuestions {
     @Column(name="TRADERS_QUESTIONS_ID")
     private Integer tradersQuestionsId;
     
-    @Column(name="DATE")
-    private Date date;
+    @Column(name="DATE_QUESTION")
+    private Date dateQuestion;
     
-    @Column(name="TEXT")
-    private String text;
+    @Column(name="TEXT_QUESTION")
+    private String textQuestion;
     
     @Column(name="AUTHOR_TYPE")
     private Integer authorType;
@@ -39,20 +39,20 @@ public class TradersQuestions {
         this.tradersQuestionsId = tradersQuestionsId;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDateQuestion() {
+        return dateQuestion;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDateQuestion(Date date) {
+        this.dateQuestion = date;
     }
 
-    public String getText() {
-        return text;
+    public String getTextQuestion() {
+        return textQuestion;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setTextQuestion(String text) {
+        this.textQuestion = text;
     }
 
     public Integer getAuthorType() {

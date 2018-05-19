@@ -13,8 +13,10 @@
 					    http://www.springframework.org/schema/tx
 					    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 	
+	<import resource="services.xml"/>
+    <import resource="dao.xml"/>
+    
 	<context:annotation-config/>
-	<!--  <context:component-scan base-package="com.brokersystem.*"/> -->
 	
 	<!--  Defines connection with database -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -39,23 +41,5 @@
     </bean>
     
     <tx:annotation-driven transaction-manager="transactionManager"/>
-    
-    <bean id="currencyDao" class="com.brokersystem.dao.BaseDAO">
-            <property name="typeObjClass">
-                <value type="java.lang.Class">com.brokersystem.models.Currency</value>
-            </property>
-    </bean>
-
-    <bean id="userSystemDao" class="com.brokersystem.dao.BaseDAO">
-            <property name="typeObjClass">
-                <value type="java.lang.Class">com.brokersystem.models.UserSystem</value>
-            </property>
-    </bean>
-
-    <bean id="tradingContractDao" class="com.brokersystem.dao.BaseDAO">
-            <property name="typeObjClass">
-                <value type="java.lang.Class">com.brokersystem.models.TradingContract</value>
-            </property>
-    </bean>
-       
+           
 </beans>

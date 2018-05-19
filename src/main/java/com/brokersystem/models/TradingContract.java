@@ -6,10 +6,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -17,6 +20,8 @@ import javax.persistence.Table;
 public class TradingContract {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTRACT_GENERATOR")
+    @SequenceGenerator(name="CONTRACT_GENERATOR", sequenceName = "GET_ID_TRADING_CONTRACT", allocationSize=1)
     @Column(name="TRADING_CONTRACT_ID")
     private Integer tradingContractId;
     
