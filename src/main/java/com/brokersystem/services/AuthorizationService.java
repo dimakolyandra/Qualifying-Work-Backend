@@ -33,8 +33,6 @@ public class AuthorizationService {
     @Qualifier("tradingContractDao")
     BaseDAO<TradingContract, Integer> tradingContractDAO;
     
-    private final static Logger logger = LoggerFactory.getLogger(Logger.class);
-
     public int getUsersCountByLogin(String userLogin){
         Map<String, String> userData = new HashMap<String, String>();
         userData.put("login", userLogin);
