@@ -6,10 +6,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -17,11 +20,16 @@ import javax.persistence.Table;
 public class TraderAccount {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACCOUNT_ID")
+    @SequenceGenerator(name="ACCOUNT_ID", sequenceName = "GET_ID_TRADER_ACCOUNT", allocationSize=1)
     @Column(name="TRADER_ACCOUNT_ID")
     private Integer traderAccountId;
     
     @Column(name="STATUS_ACCOUNT")
     private Integer statusAccount;
+    
+    @Column(name="ACCOUNT_NUMBER")
+    private String accountNumber;
     
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="TRADING_CONTRACT_ID")
@@ -37,14 +45,6 @@ public class TraderAccount {
     @OneToMany(fetch=FetchType.EAGER, mappedBy="buyAccount", cascade=CascadeType.ALL)
     private List<TradersOrder> buyAccount;
 
-    public List<TradersOrder> getBuyAccount() {
-        return buyAccount;
-    }
-
-    public void setBuyAccount(List<TradersOrder> buyAccount) {
-        this.buyAccount = buyAccount;
-    }
-
     public Integer getTraderAccountId() {
         return traderAccountId;
     }
@@ -59,6 +59,14 @@ public class TraderAccount {
 
     public void setStatusAccount(Integer statusAccount) {
         this.statusAccount = statusAccount;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 
     public TradingContract getContract() {
@@ -84,6 +92,15 @@ public class TraderAccount {
     public void setSellOrders(List<TradersOrder> sellOrders) {
         this.sellOrders = sellOrders;
     }
+
+    public List<TradersOrder> getBuyAccount() {
+        return buyAccount;
+    }
+
+    public void setBuyAccount(List<TradersOrder> buyAccount) {
+        this.buyAccount = buyAccount;
+    }
+
 
 
 }

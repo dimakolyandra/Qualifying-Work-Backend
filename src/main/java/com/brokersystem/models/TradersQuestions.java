@@ -24,8 +24,8 @@ public class TradersQuestions {
     @Column(name="TEXT_QUESTION")
     private String textQuestion;
     
-    @Column(name="AUTHOR_TYPE")
-    private Integer authorType;
+    @Column(name="AUTHOR_FLAG")
+    private Integer authorFlag;
     
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="TRADING_CONTRACT_ID")
@@ -55,12 +55,12 @@ public class TradersQuestions {
         this.textQuestion = text;
     }
 
-    public Integer getAuthorType() {
-        return authorType;
+    public Integer getAuthorFlag() {
+        return authorFlag;
     }
 
-    public void setAuthorType(Integer authorType) {
-        this.authorType = authorType;
+    public void setAuthorFlag(Integer authorType) {
+        this.authorFlag = authorType;
     }
 
     public TradingContract getContract() {

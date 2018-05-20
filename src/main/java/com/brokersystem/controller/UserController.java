@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.brokersystem.models.UserSystem;
 import com.brokersystem.request.RegistrationRequest;
 import com.brokersystem.response.BaseResponse;
 import com.brokersystem.response.UsersCountResponse;
@@ -38,10 +37,7 @@ public class UserController {
             return new BaseResponse();
         }
         catch(Exception ex){
-            logger.info("ERROR: " + ex.getMessage());
             return new BaseResponse("Authorisation servie error");
         }
-    }
-    
-    
+    }    
 }

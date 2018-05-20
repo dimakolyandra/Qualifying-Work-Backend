@@ -42,6 +42,12 @@ public class BaseDAO <TypeObj, TypeKey> {
         currentSession().save(newObj);
     }
     
+    public void addList(List<TypeObj> listObjs){
+        for(TypeObj obj: listObjs){
+            currentSession().save(obj);
+        }
+    }
+    
     public TypeObj getObj(TypeKey key){
         return (TypeObj) currentSession().get(typeObjClass, (Serializable) key);
     }

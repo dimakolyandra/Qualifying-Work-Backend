@@ -35,4 +35,10 @@
             </property>
     </bean>
 
+    <bean id="traderAccountDao" class="com.brokersystem.dao.BaseDAO">
+            <property name="typeObjClass">
+                <value type="java.lang.Class">com.brokersystem.models.TraderAccount</value>
+            </property>
+    </bean>
+
 </beans>
