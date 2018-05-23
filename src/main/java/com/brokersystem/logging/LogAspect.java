@@ -1,7 +1,6 @@
 package com.brokersystem.logging;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -25,15 +24,13 @@ public class LogAspect {
     
     @Around("execution(* com.brokersystem.controller..*(..)) || execution(* com.brokersystem.services..*(..))")
     public Object logMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable{
-        
+        StringBuffer logMessage = new StringBuffer();
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-   
-        Object retVal = joinPoint.proceed();
         
+        stopWatch.start();
+        Object retVal = joinPoint.proceed();            
         stopWatch.stop();
         
-        StringBuffer logMessage = new StringBuffer();
         logMessage.append(joinPoint.getTarget().getClass().getName());
         logMessage.append(".");
         logMessage.append(joinPoint.getSignature().getName());
@@ -52,8 +49,4 @@ public class LogAspect {
         return retVal;
     }
     
-    @AfterThrowing(pointcut="execution(* com.brokersystem.controller..*(..)) || execution(* com.brokersystem.services..*(..))", throwing = "ex")
-    public void logExceptions(Exception ex){
-        logger.info("ERROR: " + ex.getMessage());
-    }
 }

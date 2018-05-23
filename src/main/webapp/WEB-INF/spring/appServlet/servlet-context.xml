@@ -12,9 +12,11 @@
         http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <beans:bean id="logAspect" class="com.brokersystem.logging.LogAspect" />
+    <beans:bean id="customAuthenticationProvider" class="com.brokersystem.security.CustomAuthenticationProvider"/>
 
     <aop:aspectj-autoproxy>
         <aop:include name="logAspect" />
+        <aop:include name="customAuthenticationProvider"/>
     </aop:aspectj-autoproxy>
 
 

@@ -8,7 +8,6 @@
                         http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <bean id="logAspect" class="com.brokersystem.logging.LogAspect" />
-
     <aop:aspectj-autoproxy>
         <aop:include name="logAspect" />
     </aop:aspectj-autoproxy>

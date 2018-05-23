@@ -2,7 +2,7 @@ package com.brokersystem.request;
 
 import com.brokersystem.models.UserSystem;
 
-public class RegistrationRequest{
+public class RegistrationRequest extends BaseRequest{
     
     private UserSystem newUser;
     private Integer brokerId;
