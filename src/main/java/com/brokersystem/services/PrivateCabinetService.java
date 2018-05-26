@@ -135,7 +135,7 @@ public class PrivateCabinetService {
                     allOrders.add(orders.get(j));
             }
         }
-        for(int i = 0; i < allOrders.size(); i++){
+        for(int i = 0; i < allOrders.size(); i++){        	
             if (i >= startInd && i < endInd){
                 DealResponse dealInfo = new DealResponse();
                 UserSystem brokerWorker = allOrders.get(i).getContract().getBroker();
@@ -168,13 +168,13 @@ public class PrivateCabinetService {
             String buyIso, 
             BigDecimal value){
      
-        // Здесь должен быть запрос к серверу брокера, чтобы узнать, достаточно ли средств на счету
+     // Here will be request to bank 
      TradingContract contract = tradingContractDAO.getObj(contractId);
      TraderAccount firstAccount = findNeedAccount(contract, sellIso);
      TraderAccount secondAccount = findNeedAccount(contract, buyIso);
      TradersOrder newOrder = createNewOrder(value, contract, firstAccount, secondAccount);   
- 
-     // Здесь должен быть запрос к серверу брокера, чтобы заблокировать средства
+     
+     // Here will be request to bank
      tradersOrderDAO.add(newOrder);
     }
     
@@ -188,7 +188,6 @@ public class PrivateCabinetService {
         else{
             contracts = user.getTradersContract();
         }
-        logger.info(getOrders(contracts, isOpen, startInd, endInd).toString());
         return getOrders(contracts, isOpen, startInd, endInd);
     }
 }

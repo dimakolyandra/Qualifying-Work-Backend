@@ -52,6 +52,7 @@ public class UserController extends BaseController{
             session.setAttribute("isAuthorized", true);
             return new BaseResponse();
         }catch(Exception ex){
+        	logger.info(ex.getMessage());
             return new BaseResponse(ex.getMessage());
         }
     }

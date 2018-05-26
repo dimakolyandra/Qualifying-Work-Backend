@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.brokersystem.request.GetOpenedDealRequest;
+import com.brokersystem.request.GetDealRequest;
 import com.brokersystem.request.OpenDealRequest;
 import com.brokersystem.response.BaseResponse;
 import com.brokersystem.response.DealResponse;
@@ -51,7 +51,7 @@ public class DealsController extends BaseController{
     
     @AuthorizedOnly
     @RequestMapping(value="/open", method=RequestMethod.POST)
-    public @ResponseBody BaseResponse getOpenedDeals(@RequestBody GetOpenedDealRequest openedDealsReques){
+    public @ResponseBody BaseResponse getOpenedDeals(@RequestBody GetDealRequest openedDealsReques){
         try{
             HttpSession session = sessionStorage.get(openedDealsReques.getSessionKey());
             Integer userId = (Integer) session.getAttribute("userId");
@@ -62,10 +62,27 @@ public class DealsController extends BaseController{
                                               true);
             return resp;
         }catch(Exception ex){
-            // TODO Разобратся с ответом в случае ошибки
             logger.info(ex.getMessage());
             return new BaseResponse("Can not get opened deals");
         }
     }
-    
+
+    @AuthorizedOnly
+    @RequestMapping(value="/archieve", method=RequestMethod.POST)
+    public @ResponseBody BaseResponse getArchieveDeals(@RequestBody GetDealRequest openedDealsReques){
+        try{
+            HttpSession session = sessionStorage.get(openedDealsReques.getSessionKey());
+            Integer userId = (Integer) session.getAttribute("userId");
+            DealResponseWrapper resp = privateCabinetService.getDeals(
+                                              userId, 
+                                              Integer.parseInt(openedDealsReques.getStartInd()),
+                                              Integer.parseInt(openedDealsReques.getEndInd()),
+                                              false);
+            return resp;
+        }catch(Exception ex){
+            logger.info(ex.getMessage());
+            return new BaseResponse("Can not get archieve deals");
+        }
+    }
+
 }

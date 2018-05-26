@@ -1,6 +1,6 @@
 package com.brokersystem.request;
 
-public class GetOpenedDealRequest extends BaseRequest{
+public class GetDealRequest extends BaseRequest{
     
     private String startInd;
     private String endInd;
