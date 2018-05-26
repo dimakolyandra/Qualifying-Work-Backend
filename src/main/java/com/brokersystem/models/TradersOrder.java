@@ -5,6 +5,7 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,15 +36,15 @@ public class TradersOrder {
     @Column(name="DATE_END")
     private Date dateEnd;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="FIRST_ACCOUNT_ID")
     private TraderAccount sellAccount;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="SECOND_ACCOUNT_ID")
     private TraderAccount buyAccount;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="TRADING_CONTRACT_ID")
     private TradingContract contract;
 

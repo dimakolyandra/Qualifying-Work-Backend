@@ -22,6 +22,8 @@ import com.brokersystem.models.TradersOrder;
 import com.brokersystem.models.TradingContract;
 import com.brokersystem.models.UserSystem;
 import com.brokersystem.response.ContractListResponse;
+import com.brokersystem.response.DealResponse;
+import com.brokersystem.response.DealResponseWrapper;
 
 @Service
 public class PrivateCabinetService {
@@ -117,18 +119,76 @@ public class PrivateCabinetService {
         return null;
     }
     
+    private DealResponseWrapper getOrders(
+            List<TradingContract> contracts, 
+            boolean isOpen, 
+            int startInd, 
+            int endInd){
+        List<DealResponse> result = new ArrayList<DealResponse>();
+        List<TradersOrder> allOrders = new ArrayList<TradersOrder>();
+        for(int i = 0; i < contracts.size(); i++){
+            List<TradersOrder> orders = contracts.get(i).getTradersOrder();
+            for(int j = 0; j < orders.size(); j++){
+                if (isOpen && orders.get(j).getStatus().equals("OPEN"))
+                    allOrders.add(orders.get(j));
+                else if(!isOpen && orders.get(j).getStatus().equals("CLOSE"))
+                    allOrders.add(orders.get(j));
+            }
+        }
+        for(int i = 0; i < allOrders.size(); i++){
+            if (i >= startInd && i < endInd){
+                DealResponse dealInfo = new DealResponse();
+                UserSystem brokerWorker = allOrders.get(i).getContract().getBroker();
+                BrokerFirm brokerFirm = allOrders.get(i).getContract().getBroker().getBrokerFirm();
+                String brokerInfo = brokerWorker.getFirstName() + " " + brokerWorker.getSecondName();
+                brokerInfo += "(" + brokerFirm.getFirmName() + ")";
+                
+                if(!isOpen)
+                    dealInfo.setDateClose(allOrders.get(i).getDateEnd().toString());
+                
+                dealInfo.setId(allOrders.get(i).getTradersOrderId().toString());
+                dealInfo.setDateOpen(allOrders.get(i).getDateBegin().toString());
+                dealInfo.setValue(allOrders.get(i).getValue().toString());
+                dealInfo.setSellAccount(allOrders.get(i).getSellAccount().getAccountNumber());
+                dealInfo.setBuyAccount(allOrders.get(i).getBuyAccount().getAccountNumber());
+                dealInfo.setSellIso(allOrders.get(i).getSellAccount().getAccountCurrency().getISO());
+                dealInfo.setBuyIso(allOrders.get(i).getBuyAccount().getAccountCurrency().getISO());
+                dealInfo.setBrokersData(brokerInfo);
+                
+                result.add(dealInfo);
+            }
+        }
+        return new DealResponseWrapper(result, allOrders.size());
+    }
+    
     @Transactional
     public void openNewDeal(
             Integer contractId, 
             String sellIso, 
             String buyIso, 
             BigDecimal value){
-     // Здесь должен быть запрос к серверу брокера, чтобы узнать, достаточно ли средств на счету
+     
+        // Здесь должен быть запрос к серверу брокера, чтобы узнать, достаточно ли средств на счету
      TradingContract contract = tradingContractDAO.getObj(contractId);
      TraderAccount firstAccount = findNeedAccount(contract, sellIso);
      TraderAccount secondAccount = findNeedAccount(contract, buyIso);
      TradersOrder newOrder = createNewOrder(value, contract, firstAccount, secondAccount);   
+ 
      // Здесь должен быть запрос к серверу брокера, чтобы заблокировать средства
      tradersOrderDAO.add(newOrder);
+    }
+    
+    @Transactional
+    public DealResponseWrapper getDeals(Integer userId, int startInd, int endInd, boolean isOpen){
+        List<TradingContract> contracts;
+        UserSystem user = userDAO.getObj(userId);
+        if (user.getUserType() == 1){
+            contracts = user.getBrokersContract();
+        }
+        else{
+            contracts = user.getTradersContract();
+        }
+        logger.info(getOrders(contracts, isOpen, startInd, endInd).toString());
+        return getOrders(contracts, isOpen, startInd, endInd);
     }
 }

@@ -1,6 +1,8 @@
 package com.brokersystem.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.brokersystem.models.UserSystem;
-import com.brokersystem.request.BaseRequest;
+import com.brokersystem.request.GetOpenedDealRequest;
 import com.brokersystem.request.OpenDealRequest;
 import com.brokersystem.response.BaseResponse;
+import com.brokersystem.response.DealResponse;
+import com.brokersystem.response.DealResponseWrapper;
 import com.brokersystem.security.AuthorizedOnly;
 import com.brokersystem.services.PrivateCabinetService;
 
@@ -43,6 +46,25 @@ public class DealsController extends BaseController{
         }catch(Exception ex){
             logger.info(ex.getMessage());
             return new BaseResponse("Can not open deal");
+        }
+    }
+    
+    @AuthorizedOnly
+    @RequestMapping(value="/open", method=RequestMethod.POST)
+    public @ResponseBody BaseResponse getOpenedDeals(@RequestBody GetOpenedDealRequest openedDealsReques){
+        try{
+            HttpSession session = sessionStorage.get(openedDealsReques.getSessionKey());
+            Integer userId = (Integer) session.getAttribute("userId");
+            DealResponseWrapper resp = privateCabinetService.getDeals(
+                                              userId, 
+                                              Integer.parseInt(openedDealsReques.getStartInd()),
+                                              Integer.parseInt(openedDealsReques.getEndInd()),
+                                              true);
+            return resp;
+        }catch(Exception ex){
+            // TODO Разобратся с ответом в случае ошибки
+            logger.info(ex.getMessage());
+            return new BaseResponse("Can not get opened deals");
         }
     }
     
