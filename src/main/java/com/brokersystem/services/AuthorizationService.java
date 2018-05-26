@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import com.brokersystem.models.UserSystem;
 @Service
 public class AuthorizationService {
 
+    private final static Logger logger = LoggerFactory.getLogger(Logger.class);
+  
     @Autowired
     @Qualifier("userSystemDao")
     BaseDAO<UserSystem, Integer> userDAO;
@@ -43,7 +47,7 @@ public class AuthorizationService {
     
     @Autowired
     @Qualifier("traderAccountDao")
-    BaseDAO<TraderAccount, String> traderAccountDAO;
+    BaseDAO<TraderAccount, Integer> traderAccountDAO;
 
     public int getUsersCountByLogin(String userLogin){
         Map<String, String> userData = new HashMap<String, String>();
@@ -130,8 +134,8 @@ public class AuthorizationService {
         String encrPass = encryptPassword(login, password);
         userData.put("login", login);
         userData.put("password", encrPass);
-        List<UserSystem> user = userDAO.getObjectsByFieldsValue(userData);
-        return user.get(0); 
+        UserSystem user = userDAO.getObjectsByFieldsValue(userData).get(0);
+        return user; 
     }
     
 }

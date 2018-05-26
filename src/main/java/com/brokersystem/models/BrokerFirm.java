@@ -29,8 +29,11 @@ public class BrokerFirm {
     
     @Column(name="AVATAR_URL")
     private String avatarUrl;
+
+    @Column(name="DESCRIPTION")
+    private String description;
     
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="brokerFirm", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="brokerFirm", cascade=CascadeType.ALL)
     private List<UserSystem> firmWorkers;
 
     public Integer getBrokerFirmId() {
@@ -80,4 +83,13 @@ public class BrokerFirm {
     public void setFirmWorkers(List<UserSystem> firmWorkers) {
         this.firmWorkers = firmWorkers;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }

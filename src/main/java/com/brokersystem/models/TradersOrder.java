@@ -5,9 +5,12 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -15,6 +18,8 @@ import javax.persistence.Table;
 public class TradersOrder {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ORDER_GENERATOR")
+    @SequenceGenerator(name="ORDER_GENERATOR", sequenceName = "GET_ID_TRADERS_ORDER", allocationSize=1)
     @Column(name="TRADERS_ORDER_ID")
     private Integer tradersOrderId;
     
@@ -40,7 +45,7 @@ public class TradersOrder {
     
     @ManyToOne
     @JoinColumn(name="TRADING_CONTRACT_ID")
-    private TraderAccount contract;
+    private TradingContract contract;
 
     public Integer getTradersOrderId() {
         return tradersOrderId;
@@ -98,11 +103,11 @@ public class TradersOrder {
         this.buyAccount = buyAccount;
     }
 
-    public TraderAccount getContract() {
+    public TradingContract getContract() {
         return contract;
     }
 
-    public void setContract(TraderAccount contract) {
+    public void setContract(TradingContract contract) {
         this.contract = contract;
     }
 

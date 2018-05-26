@@ -25,21 +25,21 @@ public class TradingContract {
     @Column(name="TRADING_CONTRACT_ID")
     private Integer tradingContractId;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="TRADER_USER_ID")
     private UserSystem trader;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="BROKER_USER_ID")
     private UserSystem broker;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
     private List<TraderAccount> accounts;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
     private List<TradersQuestions> tradersQuestions;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
     private List<TradersOrder> tradersOrder;
 
     public Integer getTradingContractId() {

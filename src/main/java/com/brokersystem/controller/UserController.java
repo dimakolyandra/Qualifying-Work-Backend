@@ -1,17 +1,5 @@
 package com.brokersystem.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.security.DigestException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -30,6 +18,7 @@ import com.brokersystem.request.LoginRequest;
 import com.brokersystem.request.RegistrationRequest;
 import com.brokersystem.request.UsersCountRequest;
 import com.brokersystem.response.BaseResponse;
+import com.brokersystem.response.LoginResponse;
 import com.brokersystem.response.UsersCountResponse;
 import com.brokersystem.services.AuthorizationService;
 
@@ -37,9 +26,7 @@ import com.brokersystem.services.AuthorizationService;
 @RequestMapping(value="/users", produces = "application/json")
 @SessionAttributes(value="sessionKey")
 public class UserController extends BaseController{
-
     private final static Logger logger = LoggerFactory.getLogger(Logger.class);
-    private static final String ALGORITHM = "AES";
     
     @Autowired
     @Qualifier("authorizationService")
@@ -61,11 +48,11 @@ public class UserController extends BaseController{
                     registrationRequest.getNewUser(), 
                     registrationRequest.getBrokerId());
             HttpSession session = sessionStorage.get(uuid);
-            session.setAttribute("user", registrationRequest.getNewUser());
+            session.setAttribute("userId", registrationRequest.getNewUser());
             session.setAttribute("isAuthorized", true);
             return new BaseResponse();
         }catch(Exception ex){
-            return new BaseResponse("Can not register");
+            return new BaseResponse(ex.getMessage());
         }
     }
     
@@ -78,10 +65,11 @@ public class UserController extends BaseController{
                     loginRequest.getLogin(), 
                     loginRequest.getPassword());
             HttpSession session = sessionStorage.get(uuid);
-            session.setAttribute("user", loggedUser);
-            session.setAttribute("isAuthorized", true);            
-            return new BaseResponse();
+            session.setAttribute("userId", loggedUser.getUserSystemId());
+            session.setAttribute("isAuthorized", true);           
+            return new LoginResponse(loggedUser.getFirstName(), loggedUser.getSecondName());
         } catch (Exception e) {
+            logger.info(e.getMessage());
             return new BaseResponse("Can not autotificate");
         }
     }

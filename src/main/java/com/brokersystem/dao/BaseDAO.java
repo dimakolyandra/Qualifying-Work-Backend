@@ -34,8 +34,12 @@ public class BaseDAO <TypeObj, TypeKey> {
         this.sessionFactory = sessionFactory;
     }
     
-    private Session currentSession(){
+    public Session currentSession(){
         return sessionFactory.getCurrentSession();
+    }
+    
+    private void refreshObject(TypeObj obj){
+        currentSession().refresh(obj);
     }
     
     public void add(TypeObj newObj){
@@ -63,4 +67,9 @@ public class BaseDAO <TypeObj, TypeKey> {
         }
         return criteria.list();
     }
+    
+    public List<TypeObj> getAllObjects(){
+        return currentSession().createCriteria(typeObjClass).list();
+    }
+    
 }
