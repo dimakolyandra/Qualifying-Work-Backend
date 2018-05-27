@@ -7,18 +7,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.brokersystem.dao.BaseDAO;
 import com.brokersystem.models.BrokerFirm;
 import com.brokersystem.models.TraderAccount;
 import com.brokersystem.models.TradersOrder;
+import com.brokersystem.models.TradersQuestions;
 import com.brokersystem.models.TradingContract;
 import com.brokersystem.models.UserSystem;
 import com.brokersystem.response.ContractListResponse;
@@ -26,29 +23,9 @@ import com.brokersystem.response.DealResponse;
 import com.brokersystem.response.DealResponseWrapper;
 
 @Service
-public class PrivateCabinetService {
+public class PrivateCabinetService extends BaseService{
 
     private final static Logger logger = LoggerFactory.getLogger(Logger.class);
-    
-    @Autowired
-    @Qualifier("brokerFirmDao")
-    BaseDAO<BrokerFirm, Integer> brokerFirmDAO;
-
-    @Autowired
-    @Qualifier("userSystemDao")
-    BaseDAO<UserSystem, Integer> userDAO;
-    
-    @Autowired
-    @Qualifier("tradingContractDao")
-    BaseDAO<TradingContract, Integer> tradingContractDAO;
-        
-//    @Autowired
-//    @Qualifier("traderAccountDao")
-//    BaseDAO<TraderAccount, Integer> traderAccountDAO;
-
-    @Autowired
-    @Qualifier("tradersOrderDao")
-    BaseDAO<TradersOrder, Integer> tradersOrderDAO;
     
     private void setNullUsersAndGetFirmNames(List<TradingContract> contracts){
         for(TradingContract contract: contracts)
@@ -66,6 +43,16 @@ public class PrivateCabinetService {
         return result;
     }
     
+    private List<TradingContract> getOnlyOpened(List<TradingContract> contracts){
+    	List<TradingContract> result = new ArrayList<TradingContract>();
+    	for(TradingContract contract: contracts){
+    		if (contract.getContractStatus().equals("OPEN")){
+    			result.add(contract);
+    		}
+    	}
+    	return result;
+    }
+    
     @Transactional
     public ContractListResponse getDataForNewDeal(Integer userId){
         UserSystem user = userDAO.getObj(userId);
@@ -77,7 +64,7 @@ public class PrivateCabinetService {
             contracts = user.getTradersContract();
         }
         setNullUsersAndGetFirmNames(contracts);
-        return new ContractListResponse(setContractsData(contracts));
+        return new ContractListResponse(setContractsData(getOnlyOpened(contracts)));
     }
     
     @Transactional
@@ -127,7 +114,7 @@ public class PrivateCabinetService {
         List<DealResponse> result = new ArrayList<DealResponse>();
         List<TradersOrder> allOrders = new ArrayList<TradersOrder>();
         for(int i = 0; i < contracts.size(); i++){
-            List<TradersOrder> orders = contracts.get(i).getTradersOrder();
+        	List<TradersOrder> orders = contracts.get(i).getTradersOrder();
             for(int j = 0; j < orders.size(); j++){
                 if (isOpen && orders.get(j).getStatus().equals("OPEN"))
                     allOrders.add(orders.get(j));
@@ -137,15 +124,13 @@ public class PrivateCabinetService {
         }
         for(int i = 0; i < allOrders.size(); i++){        	
             if (i >= startInd && i < endInd){
-                DealResponse dealInfo = new DealResponse();
+                DealResponse dealInfo = new DealResponse();                
                 UserSystem brokerWorker = allOrders.get(i).getContract().getBroker();
-                BrokerFirm brokerFirm = allOrders.get(i).getContract().getBroker().getBrokerFirm();
+                BrokerFirm brokerFirm = allOrders.get(i).getContract().getBroker().getBrokerFirm();                
                 String brokerInfo = brokerWorker.getFirstName() + " " + brokerWorker.getSecondName();
-                brokerInfo += "(" + brokerFirm.getFirmName() + ")";
-                
+                brokerInfo += "(" + brokerFirm.getFirmName() + ")";                
                 if(!isOpen)
                     dealInfo.setDateClose(allOrders.get(i).getDateEnd().toString());
-                
                 dealInfo.setId(allOrders.get(i).getTradersOrderId().toString());
                 dealInfo.setDateOpen(allOrders.get(i).getDateBegin().toString());
                 dealInfo.setValue(allOrders.get(i).getValue().toString());
@@ -154,7 +139,6 @@ public class PrivateCabinetService {
                 dealInfo.setSellIso(allOrders.get(i).getSellAccount().getAccountCurrency().getISO());
                 dealInfo.setBuyIso(allOrders.get(i).getBuyAccount().getAccountCurrency().getISO());
                 dealInfo.setBrokersData(brokerInfo);
-                
                 result.add(dealInfo);
             }
         }
@@ -189,5 +173,37 @@ public class PrivateCabinetService {
             contracts = user.getTradersContract();
         }
         return getOrders(contracts, isOpen, startInd, endInd);
+    }
+    
+    @Transactional
+    public void addContract(Integer userId, Integer brokerFirmId){
+    	UserSystem user = userDAO.getObj(userId);
+    	BrokerFirm choosenFirm = brokerFirmDAO.getObj(brokerFirmId);
+        UserSystem leastLoadedWorker = getLeastLoadedWorker(choosenFirm);
+        TradingContract newContract = new TradingContract();
+        newContract.setContractStatus("OPEN");
+        newContract.setBroker(leastLoadedWorker);
+        newContract.setTrader(user);
+        tradingContractDAO.add(newContract);
+        List<TraderAccount> generatedAccounts = generateAccounts(newContract);
+        traderAccountDAO.addList(generatedAccounts);
+    }
+    
+    private boolean hasOpenedDeals(TradingContract contract){
+    	for(TradersOrder order: contract.getTradersOrder()){
+    		if (order.getStatus().equals("OPEN"))
+    			return true;
+    	}
+    	return false;
+    }
+    
+    @Transactional
+    public boolean removeContract(Integer contractId){
+    	TradingContract contract = tradingContractDAO.getObj(contractId);
+    	if (hasOpenedDeals(contract))
+    		return false;
+    	contract.setContractStatus("CLOSE");
+    	tradingContractDAO.updateObj(contract);
+    	return true;
     }
 }

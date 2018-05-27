@@ -80,7 +80,6 @@ public class DealsController extends BaseController{
                                               false);
             return resp;
         }catch(Exception ex){
-            logger.info(ex.getMessage());
             return new BaseResponse("Can not get archieve deals");
         }
     }

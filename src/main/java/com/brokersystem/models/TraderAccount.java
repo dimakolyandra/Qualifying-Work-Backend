@@ -31,7 +31,7 @@ public class TraderAccount {
     @Column(name="ACCOUNT_NUMBER")
     private String accountNumber;
     
-    @ManyToOne(fetch=FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
     @JoinColumn(name="TRADING_CONTRACT_ID")
     private TradingContract contract;
     
@@ -39,10 +39,10 @@ public class TraderAccount {
     @JoinColumn(name="CURR_ISO")
     private Currency accountCurrency;
     
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="sellAccount", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="sellAccount", orphanRemoval=true, cascade=CascadeType.REMOVE)
     private List<TradersOrder> sellOrders;
     
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="buyAccount", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="buyAccount", orphanRemoval=true, cascade=CascadeType.REMOVE)
     private List<TradersOrder> buyAccount;
 
     public Integer getTraderAccountId() {

@@ -25,6 +25,9 @@ public class TradingContract {
     @Column(name="TRADING_CONTRACT_ID")
     private Integer tradingContractId;
     
+    @Column(name="CONTRACT_STATUS")
+    private String contractStatus;
+    
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="TRADER_USER_ID")
     private UserSystem trader;
@@ -33,13 +36,13 @@ public class TradingContract {
     @JoinColumn(name="BROKER_USER_ID")
     private UserSystem broker;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.REMOVE)
     private List<TraderAccount> accounts;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.REMOVE)
     private List<TradersQuestions> tradersQuestions;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="contract", cascade=CascadeType.REMOVE)
     private List<TradersOrder> tradersOrder;
 
     public Integer getTradingContractId() {
@@ -89,5 +92,12 @@ public class TradingContract {
     public void setTradersOrder(List<TradersOrder> tradersOrder) {
         this.tradersOrder = tradersOrder;
     }
+    
+    public String getContractStatus(){
+    	return contractStatus;
+    }
 
+    public void setContractStatus(String contractStatus){
+    	this.contractStatus = contractStatus;
+    }
 }

@@ -47,4 +47,11 @@
             </property>
     </bean>
 
+    <bean id="tradersQuestionsDao" class="com.brokersystem.dao.BaseDAO">
+            <property name="typeObjClass">
+                <value type="java.lang.Class">com.brokersystem.models.TradersQuestions</value>
+            </property>
+    </bean>
+	
+	
 </beans>
