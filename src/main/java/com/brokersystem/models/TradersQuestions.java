@@ -5,9 +5,12 @@ import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -15,6 +18,8 @@ import javax.persistence.Table;
 public class TradersQuestions {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "QUESTIONS_ID")
+    @SequenceGenerator(name="QUESTIONS_ID", sequenceName = "GET_ID_TRADERS_QUESTIONS", allocationSize=1)
     @Column(name="TRADERS_QUESTIONS_ID")
     private Integer tradersQuestionsId;
     

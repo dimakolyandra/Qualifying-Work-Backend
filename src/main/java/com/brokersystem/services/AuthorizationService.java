@@ -50,6 +50,7 @@ public class AuthorizationService extends BaseService{
         tradingContractDAO.add(newContract);
         List<TraderAccount> generatedAccounts = generateAccounts(newContract);
         traderAccountDAO.addList(generatedAccounts);
+        addFirstMessage(newContract);
     }
     
     @Transactional

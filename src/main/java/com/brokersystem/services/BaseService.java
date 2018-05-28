@@ -1,6 +1,8 @@
 package com.brokersystem.services;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -46,12 +48,6 @@ public class BaseService {
     @Autowired
     @Qualifier("tradersQuestionsDao")
     protected BaseDAO<TradersQuestions, Integer> tradersQuestionsDAO;
-    
-//  @Autowired
-//  @Qualifier("traderAccountDao")
-//  BaseDAO<TraderAccount, Integer> traderAccountDAO;
-
-
     
     protected UserSystem getLeastLoadedWorker(BrokerFirm choosenFirm) {
         List<UserSystem> workers = choosenFirm.getFirmWorkers();
@@ -103,5 +99,15 @@ public class BaseService {
         return accounts;
     }
 
+    protected void addFirstMessage(TradingContract contract){
+    	TradersQuestions firstMessage = new TradersQuestions();
+    	String text = "Здравствуйте, вас будет обслуживать брокер " + contract.getBroker().getFirstName();
+    	text += " " + contract.getBroker().getSecondName() + "!";
+    	firstMessage.setAuthorFlag(1);
+    	firstMessage.setContract(contract);
+    	firstMessage.setDateQuestion(new Date(Calendar.getInstance().getTime().getTime()));
+    	firstMessage.setTextQuestion(text);
+    	tradersQuestionsDAO.add(firstMessage);
+    }
     
 }

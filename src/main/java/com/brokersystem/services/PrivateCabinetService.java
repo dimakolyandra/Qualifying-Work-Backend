@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,10 @@ import com.brokersystem.models.TradersOrder;
 import com.brokersystem.models.TradersQuestions;
 import com.brokersystem.models.TradingContract;
 import com.brokersystem.models.UserSystem;
+import com.brokersystem.response.ChatDialogResponse;
+import com.brokersystem.response.ChatDialogWrapper;
+import com.brokersystem.response.ChatsListResponse;
+import com.brokersystem.response.ChatsListResponseWrapper;
 import com.brokersystem.response.ContractListResponse;
 import com.brokersystem.response.DealResponse;
 import com.brokersystem.response.DealResponseWrapper;
@@ -187,6 +193,7 @@ public class PrivateCabinetService extends BaseService{
         tradingContractDAO.add(newContract);
         List<TraderAccount> generatedAccounts = generateAccounts(newContract);
         traderAccountDAO.addList(generatedAccounts);
+        addFirstMessage(newContract);
     }
     
     private boolean hasOpenedDeals(TradingContract contract){
@@ -205,5 +212,83 @@ public class PrivateCabinetService extends BaseService{
     	contract.setContractStatus("CLOSE");
     	tradingContractDAO.updateObj(contract);
     	return true;
+    }
+    
+    private TradersQuestions getLatestMessage(TradingContract contract){
+    	List<TradersQuestions> questions = contract.getTradersQuestions();
+    	return questions.get(questions.size() - 1);
+    }
+    
+    private List<ChatsListResponse> getChatsData(List<TradingContract> contracts){
+    	List<ChatsListResponse> result = new ArrayList<ChatsListResponse>();
+    	for(TradingContract contract: contracts){
+    		if (contract.getContractStatus().equals("CLOSE"))
+    			continue;
+    		ChatsListResponse chatData = new ChatsListResponse();
+    		TradersQuestions lastQuestion = getLatestMessage(contract);
+    		String title = contract.getBroker().getFirstName() + " " + contract.getBroker().getSecondName();
+    		title += "(" + contract.getBroker().getBrokerFirm().getFirmName() + ")";
+    		chatData.setAvatar(contract.getBroker().getBrokerFirm().getAvatarUrl());
+    		chatData.setId(contract.getTradingContractId());
+    		chatData.setDate(lastQuestion.getDateQuestion());
+    		chatData.setSubtitle(lastQuestion.getTextQuestion());
+    		chatData.setTitle(title);
+    		result.add(chatData);
+    	}
+    	return result;
+    }
+    
+    @Transactional
+    public ChatsListResponseWrapper getChatsList(Integer userId){
+    	UserSystem user = userDAO.getObj(userId);
+    	List<TradingContract> contracts = user.getTradersContract();
+    	List<ChatsListResponse> chatsData = getChatsData(contracts);
+    	return new ChatsListResponseWrapper(chatsData);
+    }
+    
+    private List<ChatDialogResponse> getDialogContent(TradingContract contract){
+    	List<ChatDialogResponse> content = new ArrayList<ChatDialogResponse>();
+    	for(TradersQuestions question: contract.getTradersQuestions()){
+    		ChatDialogResponse msg = new ChatDialogResponse();
+    		msg.setDate(question.getDateQuestion().toString());
+    		if (question.getAuthorFlag()==1)
+        		msg.setPosition("left");
+    		else
+    			msg.setPosition("right");
+    		msg.setText(question.getTextQuestion());
+    		msg.setType("text");
+    		msg.setId(question.getTradersQuestionsId());
+    		content.add(msg);
+    	}
+    	Collections.sort(content);
+    	return content;
+    }
+    
+    private Map<String, String> getDialogHeader(TradingContract contract){
+    	Map<String, String> header = new HashMap<String, String>();
+    	String title = contract.getBroker().getFirstName() + " " + contract.getBroker().getSecondName();
+    	title += " (" + contract.getBroker().getBrokerFirm().getFirmName() + ")";
+    	header.put("avatar", contract.getBroker().getBrokerFirm().getAvatarUrl());
+    	header.put("title", title);
+    	return header;
+    }
+    
+    @Transactional
+    public ChatDialogWrapper getDialog(Integer contractId){
+    	TradingContract contract = tradingContractDAO.getObj(contractId);
+    	List<ChatDialogResponse> content = getDialogContent(contract);
+    	Map<String, String> header = getDialogHeader(contract);
+    	return new ChatDialogWrapper(header, content);
+    }
+    
+    @Transactional
+    public void addMessage(String text, Integer contractId){
+    	TradingContract contract = tradingContractDAO.getObj(contractId);
+    	TradersQuestions newQuestion = new TradersQuestions();
+    	newQuestion.setAuthorFlag(0);
+    	newQuestion.setContract(contract);
+    	newQuestion.setDateQuestion(new Date(Calendar.getInstance().getTime().getTime()));
+    	newQuestion.setTextQuestion(text);
+    	tradersQuestionsDAO.add(newQuestion);
     }
 }
