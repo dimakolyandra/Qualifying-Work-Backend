@@ -48,7 +48,7 @@ public class UserController extends BaseController{
                     registrationRequest.getNewUser(), 
                     registrationRequest.getBrokerId());
             HttpSession session = sessionStorage.get(uuid);
-            session.setAttribute("userId", registrationRequest.getNewUser());
+            session.setAttribute("userId", registrationRequest.getNewUser().getUserSystemId());
             session.setAttribute("isAuthorized", true);
             return new BaseResponse();
         }catch(Exception ex){

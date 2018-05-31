@@ -1,6 +1,11 @@
 package com.brokersystem.services;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,10 +14,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.brokersystem.models.BrokerFirm;
 import com.brokersystem.models.TraderAccount;
@@ -27,6 +38,7 @@ import com.brokersystem.response.ChatsListResponseWrapper;
 import com.brokersystem.response.ContractListResponse;
 import com.brokersystem.response.DealResponse;
 import com.brokersystem.response.DealResponseWrapper;
+import com.brokersystem.response.QuotationsResponse;
 
 @Service
 public class PrivateCabinetService extends BaseService{
@@ -291,4 +303,32 @@ public class PrivateCabinetService extends BaseService{
     	newQuestion.setTextQuestion(text);
     	tradersQuestionsDAO.add(newQuestion);
     }
+    
+    public QuotationsResponse getCurrQuot(String currId) throws IOException{
+    	String url = "https://ru.investing.com/currencies/eur-rub-advanced-chart";
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		con.addRequestProperty("User-Agent", 
+				"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
+		con.setRequestMethod("GET");
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'GET' request to URL : " + url);
+		System.out.println("Response Code : " + responseCode);
+
+		BufferedReader in = new BufferedReader(
+		        new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		String responeStr = response.toString();
+		Document doc = Jsoup.parse(responeStr);
+    	Elements newsHeadlines = doc.select("#last_last");
+    	String quote = newsHeadlines.get(0).ownText().replaceAll(",", ".");
+    	System.out.println(quote);
+		return new QuotationsResponse(new Double(quote));
+    }	
 }
